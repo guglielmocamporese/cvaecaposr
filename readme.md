@@ -21,7 +21,12 @@ If you use the code/models hosted in this repository, please cite the following 
 
 # Install
 
-Once you have cloned the repo, all the commands below should be runned inside the main project folder `cvaecaposr`.
+Once you have cloned the repo, all the commands below should be runned inside the main project folder `cvaecaposr`:
+
+ ```python
+ # Go to the project directory
+ $ cd cvaecaposr
+ ```
 
 To run the code you need to have conda installed (version >= 4.9.2). 
 
