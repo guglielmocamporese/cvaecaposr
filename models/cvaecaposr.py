@@ -231,7 +231,6 @@ class VaeCap(torch.nn.Module):
             nn.Linear(out_dim_caps, z_dim),
             nn.Softplus(),
         )
-        self.debug = debug
 
     def forward(self, x):
         device = next(self.parameters()).device
