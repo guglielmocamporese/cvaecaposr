@@ -1,6 +1,6 @@
 # Conditional Variational Capsule Network for Open Set Recognition
 
-This repository hosts the code related to *"Conditional Variational Capsule Network for Open Set Recognition", Y. Guo, G. Camporese, W. Yang, A. Sperduti, L. Ballan, arXiv, 2021*. [[download]()]
+This repository hosts the official code related to *"Conditional Variational Capsule Network for Open Set Recognition", Y. Guo, G. Camporese, W. Yang, A. Sperduti, L. Ballan, arXiv, 2021*. [[download]()]
 
 ![alt text](images/model.png "model_diagram")
 
