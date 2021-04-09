@@ -9,7 +9,7 @@ python main.py \
     --split_num 0 \
     --z_dim 128 \
     --lr 5e-5 \
-    --t_mu_shift 3.0 \
+    --t_mu_shift 10.0 \
     --t_var_scale 0.01 \
     --alpha 1.0 \
     --beta 0.01 \
