@@ -8,7 +8,7 @@ If you use the code/models hosted in this repository, please cite the following 
 
 ```
 @article{guo2021cvaecaposr,
-  author = {Yunrui Guo, Guglielmo Camporese, Wenjing Yang, Alessandro Sperduti, Lamberto Ballan},
+  author = {Y. Guo, G. Camporese, W. Yang, A. Sperduti, L. Ballan},
   journal = {},
   title = {Conditional Variational Capsule Network for Open Set Recognition},
   year = {2021}
@@ -16,7 +16,7 @@ If you use the code/models hosted in this repository, please cite the following 
 ```
 
 # Updates
-- **[08/04/2021]** - The code is online!
+- **[09/04/2021]** - The code is online!
 
 
 # Install
@@ -61,7 +61,7 @@ After the download you will find the model checkpoints in the `./checkpoints` fo
 - `./checkpoints/cifar+50.ckpt`
 - `./checkpoints/tiny_imagenet.ckpt`
 
-The size of each checkpoint file is between ~390 MB and ~750 MB.
+The size of each checkpoint file is between ~370 MB and ~670 MB.
 
 
 # Experiments
