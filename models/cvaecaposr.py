@@ -494,7 +494,6 @@ def get_model(args, data_info):
     }
     model = CVAECapOSR(**model_args)
     if len(args.checkpoint) > 0:
-        model = model.load_from_checkpoint(args.checkpoint, num_classes=model_args['num_classes'], 
-                                           in_channels=model_args['in_channels'])
+        model = model.load_from_checkpoint(args.checkpoint, **model_args)
         print(f'Loaded model checkpoint {args.checkpoint}')
     return model
