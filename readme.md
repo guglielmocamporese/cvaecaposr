@@ -71,7 +71,7 @@ For the training you will need ~7300 MiB of GPU memory whereas for test ~5000 Mi
 
 ## Train
 
-The **CVAECapOsr** model can be trained using the `main.py` program. Here we reported an example of a training script for the `mnist` experiment:
+The **CVAECapOSR** model can be trained using the `main.py` program. Here we reported an example of a training script for the `mnist` experiment:
 
 ```bash
 python main.py \
@@ -117,7 +117,7 @@ All the temporary files of the training stage (model checkpoints, tensorboard me
 
 ## Test
 
-The **CVAECapOsr** model can be tested using the `main.py` program. Here we reported an example of a test script for the `mnist` experiment:
+The **CVAECapOSR** model can be tested using the `main.py` program. Here we reported an example of a test script for the `mnist` experiment:
 
 ```bash
 python main.py \
