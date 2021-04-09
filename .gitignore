@@ -1,6 +1,4 @@
 data
 __pycache__
-*ipynb*
-lightning_logs
 tmp
 checkpoints
