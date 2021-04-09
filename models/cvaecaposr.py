@@ -178,8 +178,6 @@ class DenseCapsule(nn.Module):
         # The prior for coupling coefficient, initialized as zeros.
         # b.size = [batch, out_num_caps, in_num_caps]
         b = Variable(torch.zeros(x.size(0), self.out_num_caps, self.in_num_caps)).to(device)
-        #if x.get_device() > 0:
-        #    b = b.to(x.get_device())
 
         assert self.routings > 0, 'The \'routings\' should be > 0.'
         for i in range(self.routings):
@@ -210,8 +208,7 @@ class DenseCapsule(nn.Module):
 ##################################################
 
 class VaeCap(torch.nn.Module):
-    def __init__(self, planes, in_dim_caps, out_num_caps, out_dim_caps, spatial_size=4, t_mu_shift=1.0, z_dim=64, 
-                 debug=False):
+    def __init__(self, planes, in_dim_caps, out_num_caps, out_dim_caps, spatial_size=4, t_mu_shift=1.0, z_dim=64):
         super(VaeCap, self).__init__()
 
         self.in_dim_caps = in_dim_caps
@@ -220,7 +217,7 @@ class VaeCap(torch.nn.Module):
         self.conv_pose = nn.Sequential(
             nn.Conv2d(planes, planes, kernel_size=3, stride=1, padding=1, bias=False),
             nn.BatchNorm2d(planes),
-            nn.ReLU(inplace=True), # Maybe omit this activation
+            nn.ReLU(inplace=True),
         )
         self.dense_capsule = DenseCapsule(in_num_caps=(spatial_size ** 2) * (planes // in_dim_caps), 
                                           in_dim_caps=in_dim_caps, out_num_caps=out_num_caps, 
@@ -229,51 +226,26 @@ class VaeCap(torch.nn.Module):
             nn.Linear(out_dim_caps, 1024),
             nn.ReLU(),
             nn.Linear(1024, z_dim),
-            #nn.Linear(out_dim_caps, z_dim),
         )
         self.fc_var = nn.Sequential(
             nn.Linear(out_dim_caps, z_dim),
             nn.Softplus(),
         )
-        #self.dense_capsule_mean = DenseCapsule(in_num_caps=(spatial_size ** 2) * (planes // in_dim_caps), 
-        #                                  in_dim_caps=in_dim_caps, out_num_caps=out_num_caps, 
-        #                                  out_dim_caps=out_dim_caps, routings=3)
-        #self.dense_capsule_var = DenseCapsule(in_num_caps=(spatial_size ** 2) * (planes // in_dim_caps), 
-        #                                  in_dim_caps=in_dim_caps, out_num_caps=out_num_caps, 
-        #                                  out_dim_caps=out_dim_caps, routings=3)
         self.debug = debug
-        if self.debug:
-            print(f'Num in caps: {(spatial_size ** 2) * (planes // in_dim_caps)}')
-            print(f'In caps size: {in_dim_caps}')
-            print(f'Num out caps: {out_num_caps}')
-            print(f'Out caps size: {out_dim_caps}')
 
     def forward(self, x):
         device = next(self.parameters()).device
         capconv = self.conv_pose(x) # [batch_size, planes, spatial_size, spatial_size]
-        if self.debug:
-            print('capconv', capconv.shape)
         batch_size, planes, spatial_size, spatial_size = capconv.shape
         pose = capconv.view(batch_size, planes // self.in_dim_caps, self.in_dim_caps, spatial_size, spatial_size)
-        if self.debug:
-            print('pose0', pose.shape)
         pose = pose.permute(0, 1, 3, 4, 2).contiguous() # [batch_size, n_groups, spatial_size, spatial_size, in_dim_caps]
         pose = pose.view(batch_size, -1, self.in_dim_caps)
         pose = squash(pose) # [batch_size, (spatial_size ** 2) * (planes // in_dim_caps), in_dim_caps]
-        if self.debug:
-            print('pose1', pose.shape)
         out = self.dense_capsule(pose) # [bs, num_classes, out_dim_caps]
-        if self.debug:
-            print(out.shape)
 
         # Variational part
-        z_mu = self.fc_mean(out) # # [bs, num_classes, z_dim]
+        z_mu = self.fc_mean(out) # [bs, num_classes, z_dim]
         z_var = self.fc_var(out) + 1e-8
-        #z_mu = self.dense_capsule_mean(pose)
-        #z_var = F.softplus(self.dense_capsule_var(pose)) + 1e-8
-        #print(pose.shape)
-
-        #z_var = self.fc_var(pose) + 1e-8
         z = self._reparametrization_trick(z_mu, z_var, device=device)
         return z, z_mu, z_var
 
@@ -325,42 +297,6 @@ class CVAECapOSR(pl.LightningModule):
         t_var_init = t_var_init * t_var_scale
         t_var = nn.Embedding.from_pretrained(t_var_init.to(device), freeze=False)
         return t_mean, t_var
-    
-    def _cross_kl_div(self, z_mu, z_var, detach_inputs=False, detach_targets=False):
-        """
-        Compute kl divergence between the variation capsule distribution defined by z_mu and z_var with all the 
-        targets.
-        
-        Args:
-            z_mu: tensor of shape [bs, num_classes, z_dim].
-            z_var: tensor of shape [bs, num_classes, z_dim].
-            detach_inputs: bool.
-            detach_targets: bool.
-            
-        Ouput:
-            kl: tensor of shape [bs, num_classes]
-        """
-        B, num_classes, _ = z_mu.shape
-        kl = []
-        t_idxs = torch.arange(num_classes).unsqueeze(0).repeat(B, 1).to(z_mu.device)
-        t_means = self.t_mean(t_idxs).view(B, num_classes, num_classes, -1) # [bs, num_classes, num_classes, z_dim]
-        t_vars = self.t_var(t_idxs).view(B, num_classes, num_classes, -1) # [bs, num_classes, num_classes, z_dim]
-        
-        # Detach inputs
-        if detach_inputs:
-            z_mu = z_mu.detach()
-            z_var = z_var.detach()
-            
-        # Detach targets
-        if detach_inputs:
-            t_means = t_means.detach()
-            t_vars = t_vars.detach()
-            
-        for t_mean_i, t_var_i in zip(t_means.permute(1, 0, 2, 3), t_vars.permute(1, 0, 2, 3)):
-            kl_i = kl_div(z_mu, z_var, t_mean_i, t_var_i) # [bs, num_classes]
-            kl += [kl_i]
-        kl = torch.stack(kl, 1).mean(1) # [bs, num_classes]
-        return kl
     
     def cross_kl_div(self, z_mu, z_var, detach_inputs=False, detach_targets=False):
         """
