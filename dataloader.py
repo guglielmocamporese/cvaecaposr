@@ -12,7 +12,11 @@ from sklearn.model_selection import train_test_split
 import subprocess
 from PIL import Image
 
+
+##################################################
 # Utils
+##################################################
+
 class AugDataset(Dataset):
     def __init__(self, ds, transform):
         super(AugDataset, self).__init__()
@@ -148,6 +152,34 @@ class TinyImagenetDataset(Dataset):
 ##################################################
 # Datasets
 ##################################################
+
+"""
+    Each dataset will return samples of the forms (x, y) where:
+    - x is the image tensor of shape [channels, height, width].
+    - y is the label in forms of string "{source_id}_{relative_class}_{absolute_class}".
+
+        More specifically:
+            - source_id: can be "k" for known samples, or "u" for unknown samples.
+            - relative_class: it is the index of the class of the dataset relative to the absolute class.
+            - absolute_class: it is the actual class of the dataset.
+    
+            Example:
+                dataset: MNIST
+                known_classes: [0, 3, 4, 6, 8, 9] 
+                    -> absolute_classes: [0, 3, 4, 6, 8, 9] 
+                    -> relative_classes: [0, 1, 2, 3, 4, 5]
+                unknown_classes: [1, 2, 5, 7]
+                    -> absolute_classes: [1, 2, 5, 7] 
+                    -> relative_classes: [0, 1, 2, 3]
+
+                    -> a sample from class 9 of the known dataset will be:
+                        x: image,
+                        y: "k_5_9"
+
+                    -> a sample from class 5 of the unknown dataset will be:
+                        x: image,
+                        y: "u_2_5"
+"""
 
 def get_datasets(args):
     target_transforms = {
