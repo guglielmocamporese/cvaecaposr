@@ -33,7 +33,7 @@ download_ckpt "1WQq4SZHpELIwB60O2A8LZ57f1dOhk3hf" "${CKPT_OUTPATH}/svhn.ckpt"
 download_ckpt "1Ly5bA_4fZNLrizS0lxGNTDc5kkd85SvP" "${CKPT_OUTPATH}/cifar10.ckpt"
 download_ckpt "1VzAeRbT9ALTy4EcJhKki5TlcLVkqEwFo" "${CKPT_OUTPATH}/cifar+10.ckpt"
 download_ckpt "14j_IUiKaY4lx8OapLRSjDIgA3jlqSpiO" "${CKPT_OUTPATH}/cifar+50.ckpt"
-download_ckpt "1HtDQaNlR-lfrcp3Wkm3i-IssRy_RH3af" "${CKPT_OUTPATH}/tiny_imagenet.ckpt"
+download_ckpt "1aasfPvasXWJ35QRyRzChzBxtKxm6GLc0" "${CKPT_OUTPATH}/tiny_imagenet.ckpt"
 echo
 echo "##################################################"
 echo "# All done! Model checkpoints downloaded in ${CKPT_OUTPATH}."
