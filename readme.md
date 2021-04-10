@@ -24,6 +24,9 @@ If you use the code/models hosted in this repository, please cite the following 
 Once you have cloned the repo, all the commands below should be runned inside the main project folder `cvaecaposr`:
 
  ```python
+ # Clone the repo
+ $ git clone https://github.com/guglielmocamporese/cvaecaposr.git
+ 
  # Go to the project directory
  $ cd cvaecaposr
  ```
