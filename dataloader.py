@@ -156,12 +156,12 @@ class TinyImagenetDataset(Dataset):
 """
     Each dataset will return samples of the forms (x, y) where:
     - x is the image tensor of shape [channels, height, width].
-    - y is the label in forms of string "{source_id}_{relative_class}_{absolute_class}".
+    - y is the label in forms of string "{source_id}_{absolute_class}_{relative_class}".
 
         More specifically:
             - source_id: can be "k" for known samples, or "u" for unknown samples.
-            - relative_class: it is the index of the class of the dataset relative to the absolute class.
             - absolute_class: it is the actual class of the dataset.
+            - relative_class: it is the index of the class of the dataset relative to the absolute class.
     
             Example:
                 dataset: MNIST
@@ -174,11 +174,11 @@ class TinyImagenetDataset(Dataset):
 
                     -> a sample from class 9 of the known dataset will be:
                         x: image,
-                        y: "k_5_9"
+                        y: "k_9_5"
 
                     -> a sample from class 5 of the unknown dataset will be:
                         x: image,
-                        y: "u_2_5"
+                        y: "u_5_2"
 """
 
 def get_datasets(args):
@@ -427,7 +427,6 @@ def get_datasets(args):
         ds_known_path = os.path.join(args.data_base_path, 'cifar10')
         ds_unknown_path = os.path.join(args.data_base_path, 'cifar100')
         transform = transforms.ToTensor()
-        #transform_aug = transforms.ToTensor()
         transform_aug = transforms.Compose([
             transforms.RandomCrop(32, padding=4),
             transforms.RandomHorizontalFlip(),
