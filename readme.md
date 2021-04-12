@@ -6,7 +6,7 @@ This repository hosts the official code related to *"Conditional Variational Cap
 
 If you use the code/models hosted in this repository, please cite the following paper:
 
-```
+```bibtex
 @article{guo2021cvaecaposr,
   author = {Y. Guo, G. Camporese, W. Yang, A. Sperduti, L. Ballan},
   journal = {},
