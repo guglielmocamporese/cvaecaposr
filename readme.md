@@ -1,17 +1,19 @@
 # Conditional Variational Capsule Network for Open Set Recognition
 
-This repository hosts the official code related to *"Conditional Variational Capsule Network for Open Set Recognition", Y. Guo, G. Camporese, W. Yang, A. Sperduti, L. Ballan, arXiv, 2021*. [[download]()]
+This repository hosts the official code related to *"Conditional Variational Capsule Network for Open Set Recognition", Y. Guo, G. Camporese, W. Yang, A. Sperduti, L. Ballan, arXiv, 2021*. [[download](https://arxiv.org/abs/2104.09159)]
 
 ![alt text](images/model.png "model_diagram")
 
 If you use the code/models hosted in this repository, please cite the following paper:
 
 ```bibtex
-@article{guo2021cvaecaposr,
-  author = {Y. Guo, G. Camporese, W. Yang, A. Sperduti, L. Ballan},
-  journal = {},
-  title = {Conditional Variational Capsule Network for Open Set Recognition},
-  year = {2021}
+@misc{guo2021conditional,
+      title={Conditional Variational Capsule Network for Open Set Recognition}, 
+      author={Yunrui Guo and Guglielmo Camporese and Wenjing Yang and Alessandro Sperduti and Lamberto Ballan},
+      year={2021},
+      eprint={2104.09159},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
 }
 ```
 
