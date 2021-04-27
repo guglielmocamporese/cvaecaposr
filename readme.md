@@ -27,7 +27,7 @@ If you use the code/models hosted in this repository, please cite the following 
 
 Once you have cloned the repo, all the commands below should be runned inside the main project folder `cvaecaposr`:
 
- ```python
+ ```sh
  # Clone the repo
  $ git clone https://github.com/guglielmocamporese/cvaecaposr.git
  
@@ -39,7 +39,7 @@ To run the code you need to have conda installed (version >= 4.9.2).
 
 Furthermore, all the requirements for running the code are specified in the `environment.yaml` file and can be installed with:
 
-```python
+```sh
 # Install the conda env
 $ conda env create --file environment.yaml
 
@@ -57,7 +57,7 @@ When you run the code the datasets will be automatically downloaded in the `./da
 
 You can download the model checkpoints using the `download_checkpoints.sh` script in the `scripts` folder by running:
 
-```python
+```sh
 # Extend script permissions
 $ chmod +x ./scripts/download_checkpoints.sh
 
@@ -85,26 +85,27 @@ For the training you will need ~7300 MiB of GPU memory whereas for test ~5000 Mi
 
 The **CVAECapOSR** model can be trained using the `main.py` program. Here we reported an example of a training script for the `mnist` experiment:
 
-```bash
-python main.py \
-    --data_base_path "./data" \
-    --dataset "mnist" \
-    --val_ratio 0.2 \
-    --seed 1234 \
-    --batch_size 32 \
-    --split_num 0 \
-    --z_dim 128 \
-    --lr 5e-5 \
-    --t_mu_shift 10.0 \
-    --t_var_scale 0.1 \
-    --alpha 1.0 \
-    --beta 0.01 \
-    --margin 10.0 \
-    --in_dim_caps 16 \
-    --out_dim_caps 32 \
-    --checkpoint "" \
-    --epochs 100 \
-    --mode "train"
+```sh
+# Train
+$ python main.py \
+      --data_base_path "./data" \
+      --dataset "mnist" \
+      --val_ratio 0.2 \
+      --seed 1234 \
+      --batch_size 32 \
+      --split_num 0 \
+      --z_dim 128 \
+      --lr 5e-5 \
+      --t_mu_shift 10.0 \
+      --t_var_scale 0.1 \
+      --alpha 1.0 \
+      --beta 0.01 \
+      --margin 10.0 \
+      --in_dim_caps 16 \
+      --out_dim_caps 32 \
+      --checkpoint "" \
+      --epochs 100 \
+      --mode "train"
 ```
 
 For simplicity we provide all the training scripts for the different datasets in the `scripts` folder. Specifically, you will find: 
@@ -117,7 +118,7 @@ For simplicity we provide all the training scripts for the different datasets in
 
 that you can run as follows:
 
-```python
+```sh
 # Extend script permissions
 $ chmod +x ./scripts/train_{dataset}.sh # where you have to set a dataset name
 
@@ -131,25 +132,26 @@ All the temporary files of the training stage (model checkpoints, tensorboard me
 
 The **CVAECapOSR** model can be tested using the `main.py` program. Here we reported an example of a test script for the `mnist` experiment:
 
-```bash
-python main.py \
-    --data_base_path "./data" \
-    --dataset "mnist" \
-    --val_ratio 0.2 \
-    --seed 1234 \
-    --batch_size 32 \
-    --split_num 0 \
-    --z_dim 128 \
-    --lr 5e-5 \
-    --t_mu_shift 10.0 \
-    --t_var_scale 0.1 \
-    --alpha 1.0 \
-    --beta 0.01 \
-    --margin 10.0 \
-    --in_dim_caps 16 \
-    --out_dim_caps 32 \
-    --checkpoint "checkpoints/mnist.ckpt" \
-    --mode "test"
+```sh
+# Test
+$ python main.py \
+      --data_base_path "./data" \
+      --dataset "mnist" \
+      --val_ratio 0.2 \
+      --seed 1234 \
+      --batch_size 32 \
+      --split_num 0 \
+      --z_dim 128 \
+      --lr 5e-5 \
+      --t_mu_shift 10.0 \
+      --t_var_scale 0.1 \
+      --alpha 1.0 \
+      --beta 0.01 \
+      --margin 10.0 \
+      --in_dim_caps 16 \
+      --out_dim_caps 32 \
+      --checkpoint "checkpoints/mnist.ckpt" \
+      --mode "test"
 ```
 
 For simplicity we provide all the test scripts for the different datasets in the `scripts` folder. Specifically, you will find: 
@@ -162,7 +164,7 @@ For simplicity we provide all the test scripts for the different datasets in the
 
 that you can run as follows:
 
-```python
+```sh
 # Extend script permissions
 $ chmod +x ./scripts/test_{dataset}.sh # where you have to set a dataset name
 
