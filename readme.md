@@ -6,7 +6,7 @@ This repository hosts the official code related to *"Conditional Variational Cap
 
 ![alt text](images/model_img.png "model_diagram")
 
-If you use the code/models hosted in this repository, please cite the following paper:
+If you use the code/models hosted in this repository, please cite the following paper and give a star ⭐ to the repo:
 
 ```bibtex
 @misc{guo2021conditional,
