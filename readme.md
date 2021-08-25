@@ -1,12 +1,15 @@
 # Conditional Variational Capsule Network for Open Set Recognition
 
 [![arXiv](https://img.shields.io/badge/arXiv-2104.09159-red)](https://arxiv.org/abs/2104.09159)
+[![arXiv](https://img.shields.io/badge/-ICCV-yellow)](http://iccv2021.thecvf.com/home)
+
 
 This repository hosts the official code related to *"Conditional Variational Capsule Network for Open Set Recognition", Y. Guo, G. Camporese, W. Yang, A. Sperduti, L. Ballan, arXiv:2104.09159, 2021*. [[Download](https://arxiv.org/abs/2104.09159)]
 
 ![alt text](images/model_img.png "model_diagram")
 
-If you use the code/models hosted in this repository, please cite the following paper and give a star ⭐ to the repo:
+
+If you use the code/models hosted in this repository, please cite the following paper and give a star `⭐`  to the repo:
 
 ```bibtex
 @misc{guo2021conditional,
@@ -20,7 +23,8 @@ If you use the code/models hosted in this repository, please cite the following 
 ```
 
 # Updates
-- **[09/04/2021]** - The code is online!
+- **[2021/04/09]** - The code is online,
+- **[2021/07/22]** - The paper has been accepted to ICCV-2021!
 
 
 # Install
