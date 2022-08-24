@@ -8,8 +8,10 @@ This repository hosts the official code related to *"Conditional Variational Cap
 
 ![alt text](images/model_img.png "model_diagram")
 
-
-If you use the code/models hosted in this repository, please cite the following paper and give a star `⭐`  to the repo:
+```bash
+If you use the code of this repo and you find this project useful, 
+please consider to give a star ⭐!
+```
 
 ```bibtex
 @article{Guo2021ConditionalVC,
