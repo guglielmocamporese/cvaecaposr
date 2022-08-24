@@ -12,13 +12,12 @@ This repository hosts the official code related to *"Conditional Variational Cap
 If you use the code/models hosted in this repository, please cite the following paper and give a star `⭐`  to the repo:
 
 ```bibtex
-@misc{guo2021conditional,
-      title={Conditional Variational Capsule Network for Open Set Recognition}, 
-      author={Yunrui Guo and Guglielmo Camporese and Wenjing Yang and Alessandro Sperduti and Lamberto Ballan},
-      year={2021},
-      eprint={2104.09159},
-      archivePrefix={arXiv},
-      primaryClass={cs.CV}
+@article{Guo2021ConditionalVC,
+  title={Conditional Variational Capsule Network for Open Set Recognition},
+  author={Yunrui Guo and Guglielmo Camporese and Wenjing Yang and Alessandro Sperduti and Lamberto Ballan},
+  journal={2021 IEEE/CVF International Conference on Computer Vision (ICCV)},
+  year={2021},
+  pages={103-111}
 }
 ```
 
