@@ -71,34 +71,34 @@ class ResidualStack(nn.Module):
 ##################################################
 
 class Decoder(nn.Module):
-    def __init__(self, in_channels, num_hiddens, num_residual_layers, num_residual_hiddens, out_channels=3, 
+    def __init__(self, in_channels, num_hiddens, num_residual_layers, num_residual_hiddens, out_channels=3,
                  num_mid_channels=512, lateral_dropout=0.8):
         super(Decoder, self).__init__()
-        
+
         self._conv_1 = nn.Conv2d(in_channels=in_channels,
                                  out_channels=num_hiddens,
-                                 kernel_size=3, 
+                                 kernel_size=3,
                                  stride=1, padding=1)
         self._residual_stack = ResidualStack(in_channels=num_hiddens,
                                              num_hiddens=num_hiddens,
                                              num_residual_layers=num_residual_layers,
                                              num_residual_hiddens=num_residual_hiddens)
-        
-        self._conv_trans_1 = nn.ConvTranspose2d(in_channels=num_hiddens, 
+
+        self._conv_trans_1 = nn.ConvTranspose2d(in_channels=num_hiddens,
                                                 out_channels=num_hiddens // 2,
-                                                kernel_size=4, 
+                                                kernel_size=4,
                                                 stride=2, padding=1)
-        
-        self._conv_trans_2 = nn.ConvTranspose2d(in_channels=num_hiddens // 2, 
+
+        self._conv_trans_2 = nn.ConvTranspose2d(in_channels=num_hiddens // 2,
                                                 out_channels=num_hiddens // 2,
-                                                kernel_size=4, 
+                                                kernel_size=4,
                                                 stride=2, padding=1)
-        
-        self._conv_trans_3 = nn.ConvTranspose2d(in_channels=num_hiddens // 2, 
+
+        self._conv_trans_3 = nn.ConvTranspose2d(in_channels=num_hiddens // 2,
                                                 out_channels=out_channels,
-                                                kernel_size=3, 
+                                                kernel_size=3,
                                                 stride=1, padding=1)
-        
+
         # Lateral connections
         self.conv_l3 = nn.Sequential(
             nn.Dropout(lateral_dropout),
@@ -115,26 +115,26 @@ class Decoder(nn.Module):
             nn.Conv2d(num_hiddens // 2, num_hiddens // 2, kernel_size=3, padding=1, stride=1),
             nn.ReLU(inplace=True),
         )
-        
+
 
     def forward(self, inputs, x_l1=None, x_l2=None, x_l3=None):
         x = self._conv_1(inputs)
         if x_l3 is not None:
             x = x + self.conv_l3(x_l3)
         x = self._residual_stack(x)
-        
+
         x = self._conv_trans_1(x)
         x = F.relu(x)
         if x_l2 is not None:
             x = x + self.conv_l2(x_l2)
-        
+
         x = self._conv_trans_2(x)
         x = F.relu(x)
         if x_l1 is not None:
             x = x + self.conv_l1(x_l1)
-            
+
         x = self._conv_trans_3(x)
-        return x 
+        return x
 
 
 ##################################################
@@ -219,8 +219,8 @@ class VaeCap(torch.nn.Module):
             nn.BatchNorm2d(planes),
             nn.ReLU(inplace=True),
         )
-        self.dense_capsule = DenseCapsule(in_num_caps=(spatial_size ** 2) * (planes // in_dim_caps), 
-                                          in_dim_caps=in_dim_caps, out_num_caps=out_num_caps, 
+        self.dense_capsule = DenseCapsule(in_num_caps=(spatial_size ** 2) * (planes // in_dim_caps),
+                                          in_dim_caps=in_dim_caps, out_num_caps=out_num_caps,
                                           out_dim_caps=out_dim_caps, routings=3)
         self.fc_mean = nn.Sequential(
             nn.Linear(out_dim_caps, 1024),
@@ -262,7 +262,7 @@ class VaeCap(torch.nn.Module):
 ##################################################
 
 class CVAECapOSR(pl.LightningModule):
-    def __init__(self, num_classes, in_channels, in_dim_caps=16, out_dim_caps=32, t_mu_shift=1.0, 
+    def __init__(self, num_classes, in_channels, in_dim_caps=16, out_dim_caps=32, t_mu_shift=1.0,
                  t_var_scale=1.0, z_dim=128, alpha=1.0, beta=100.0, margin=10.0, lr=3e-4):
         super(CVAECapOSR, self).__init__()
         self.z_dim = z_dim
@@ -270,22 +270,22 @@ class CVAECapOSR(pl.LightningModule):
         self.spatial_size = 8 # Spatial size of the middle feature [bs, ch, 8, 8]
         self.enc = ResNet34(in_channels=in_channels)
         self.vae_cap = VaeCap(
-            planes=512, in_dim_caps=in_dim_caps, out_num_caps=num_classes, out_dim_caps=out_dim_caps, 
+            planes=512, in_dim_caps=in_dim_caps, out_num_caps=num_classes, out_dim_caps=out_dim_caps,
             spatial_size=self.spatial_size, t_mu_shift=t_mu_shift, z_dim=z_dim,
         )
         self.fc = nn.Linear(z_dim * num_classes, 64 * self.spatial_size * self.spatial_size)
-        self.dec = Decoder(64, num_hiddens=z_dim, num_residual_layers=2, num_residual_hiddens=32, 
+        self.dec = Decoder(64, num_hiddens=z_dim, num_residual_layers=2, num_residual_hiddens=32,
                            out_channels=in_channels)
         self.t_mean = nn.Embedding(self.num_classes, self.num_classes * z_dim)
         self.t_var = nn.Embedding(self.num_classes, self.num_classes * z_dim)
         self.t_mean, self.t_var = self._init_targets(t_mu_shift, t_var_scale)
-        
+
         # Loss
         self.alpha = alpha
         self.beta = beta
         self.margin = margin
         self.lr = lr
-        
+
     def _init_targets(self, t_mu_shift, t_var_scale):
         device = self.t_mean.weight.device
         t_mean_init = 1.0 * F.one_hot(torch.arange(self.num_classes), self.num_classes)
@@ -296,18 +296,18 @@ class CVAECapOSR(pl.LightningModule):
         t_var_init = t_var_init * t_var_scale
         t_var = nn.Embedding.from_pretrained(t_var_init.to(device), freeze=False)
         return t_mean, t_var
-    
+
     def cross_kl_div(self, z_mu, z_var, detach_inputs=False, detach_targets=False):
         """
-        Compute kl divergence between the variation capsule distribution defined by z_mu and z_var with all the 
+        Compute kl divergence between the variation capsule distribution defined by z_mu and z_var with all the
         targets.
-        
+
         Args:
             z_mu: tensor of shape [bs, num_classes, z_dim].
             z_var: tensor of shape [bs, num_classes, z_dim].
             detach_inputs: bool.
             detach_targets: bool.
-            
+
         Ouput:
             kl: tensor of shape [bs, num_classes]
         """
@@ -316,40 +316,40 @@ class CVAECapOSR(pl.LightningModule):
         t_idxs = torch.arange(num_classes).unsqueeze(0).repeat(B, 1).to(z_mu.device)
         t_means = self.t_mean(t_idxs) # [bs, num_classes, num_classes * z_dim]
         t_vars = self.t_var(t_idxs) # [bs, num_classes, num_classes * z_dim]
-        
+
         # Detach inputs
         if detach_inputs:
             z_mu = z_mu.detach()
             z_var = z_var.detach()
-            
+
         # Detach targets
         if detach_targets:
             t_means = t_means.detach()
             t_vars = t_vars.detach()
-            
+
         for t_mean_i, t_var_i in zip(t_means.permute(1, 0, 2), t_vars.permute(1, 0, 2)):
             kl_i = kl_div(torch.flatten(z_mu, 1), torch.flatten(z_var, 1), t_mean_i, t_var_i) # [bs]
             kl += [kl_i]
         kl = torch.stack(kl, 1) # [bs, num_classes]
         return kl
-        
+
     def forward(self, x, y_str=None):
-        
+
         # Process label
         if y_str is None:
             y = None
         else:
             y = np.array([int(y_i.split('_')[-1]) for y_i in y_str])
             y = torch.from_numpy(y).to(x.device)
-        
+
         # Encoding
         enc_out = self.enc(x)
         x_f = enc_out['x_f']
         B, d_c, d_h, d_w = x_f.shape
-        
+
         # Latent
         z, z_mu, z_var = self.vae_cap(x_f)
-        
+
         # Target selection
         kl = self.cross_kl_div(z_mu, z_var, detach_targets=True)
         logits = - torch.log(kl)
@@ -358,16 +358,16 @@ class CVAECapOSR(pl.LightningModule):
             z = z + y_hat.unsqueeze(-1).repeat(1, 1, z.shape[-1])
         else:
             z = z + F.one_hot(y, self.num_classes).unsqueeze(-1).repeat(1, 1, z.shape[-1])
-        
+
         # Latent
         z_flat = torch.flatten(z, 1)
         z_flat = F.relu(self.fc(z_flat))
         z_chw = z_flat.view(B, -1, d_h, d_w)
-        
+
         # Decoding
         x_hat = self.dec(z_chw, x_l1=enc_out['x_l1'], x_l2=enc_out['x_l2'], x_l3=enc_out['x_l3'])
         x_hat = torch.sigmoid(x_hat)
-        
+
         # Out
         out = {
             'x_hat': x_hat,
@@ -377,30 +377,31 @@ class CVAECapOSR(pl.LightningModule):
             'z_var': z_var,
         }
         return out
-    
+
     def training_step(self, batch, idx_batch):
         x, y_str = batch
         y = torch.from_numpy(np.array([int(y_i.split('_')[-1]) for y_i in y_str])).to(x.device)
         y_oh = F.one_hot(y, self.num_classes)
-        
+
         # Forward with teacher forcing
         preds = self(x, y_str=y_str)
         t_mu, t_var = self.t_mean(y), self.t_var(y)
         t_mu = t_mu.view(preds['z_mu'].shape)
         t_var = t_var.view(preds['z_var'].shape)
-        
+
         # Loss
         loss_kl = kl_div(preds['z_mu'], preds['z_var'], t_mu.detach(), t_var.detach()).mean(-1).mean(0)
         loss_contr = self.cross_kl_div(preds['z_mu'], preds['z_var'], detach_inputs=True)
+        loss_contr = torch.log(loss_contr)
         loss_contr = torch.where(y_oh < 1, loss_contr, torch.zeros_like(loss_contr))
         loss_contr = F.relu(self.margin - loss_contr)
         loss_contr = (loss_contr / (self.num_classes - 1)).sum(-1).mean(0)
         loss_rec = F.binary_cross_entropy(preds['x_hat'], x) #F.mse_loss(x, preds['x_hat'])
         loss = loss_kl + self.beta * loss_rec + self.alpha * loss_contr
-        
+
         # Metrics
         acc = accuracy(preds['logits'].detach(), y)
-        
+
         # Cache
         self.log('train_loss_kl', loss_kl)
         self.log('train_loss_contr', loss_contr)
@@ -408,31 +409,32 @@ class CVAECapOSR(pl.LightningModule):
         self.log('train_loss', loss)
         self.log('train_acc', acc, prog_bar=True)
         return loss
-    
+
     def validation_step(self, batch, idx_batch):
         x, y_str = batch
-        
+
         y = torch.from_numpy(np.array([int(y_i.split('_')[-1]) for y_i in y_str])).to(x.device)
         y_oh = F.one_hot(y, self.num_classes)
-        
+
         # Forward with teacher forcing
         preds = self(x)
         t_mu, t_var = self.t_mean(y), self.t_var(y)
         t_mu = t_mu.view(preds['z_mu'].shape)
         t_var = t_var.view(preds['z_var'].shape)
-        
+
         # Loss
         loss_kl = kl_div(preds['z_mu'], preds['z_var'], t_mu.detach(), t_var.detach()).mean(-1).mean(0)
         loss_contr = self.cross_kl_div(preds['z_mu'], preds['z_var'], detach_inputs=True)
+        loss_contr = torch.log(loss_contr)
         loss_contr = torch.where(y_oh < 1, loss_contr, torch.zeros_like(loss_contr))
         loss_contr = F.relu(self.margin - loss_contr)
         loss_contr = (loss_contr / (self.num_classes - 1)).sum(-1).mean(0)
         loss_rec = F.binary_cross_entropy(preds['x_hat'], x)
         loss = loss_kl + self.beta * loss_rec + self.alpha * loss_contr
-        
+
         # Metrics
         acc = accuracy(preds['logits'].detach(), y)
-        
+
         # Cache
         self.log('validation_loss_kl', loss_kl)
         self.log('validation_loss_contr', loss_contr)
@@ -444,31 +446,31 @@ class CVAECapOSR(pl.LightningModule):
             x_hat_grid = torchvision.utils.make_grid(preds['x_hat'][:16], nrow=4, padding=0)
             tb_log.add_image('validation_x_hat', x_hat_grid.detach().cpu(), self.current_epoch)
         return loss
-    
+
     def test_step(self, batch, idx_batch):
         x, y_str = batch
         y_ku = torch.from_numpy(np.array([0 if y_i.split('_')[0] == 'k' else 1 for y_i in y_str])).to(x.device)
-        
+
         # Forward with teacher forcing
         preds = self(x)
         probs = torch.max(F.softmax(preds['logits'], -1), -1)[0]
-        
+
         tb_log = self.logger.experiment
         x_hat_grid = torchvision.utils.make_grid(preds['x_hat'][:16], nrow=4, padding=0)
         tb_log.add_image('test_x_hat', x_hat_grid.detach().cpu(), idx_batch)
         return torch.stack([probs, y_ku], -1)
-    
+
     def test_epoch_end(self, test_outputs):
         auroc = pl.metrics.classification.AUROC(pos_label=0)
         probs, y_ku = torch.cat(test_outputs, 0).T
         y_ku = y_ku.to(torch.int64)
         self.log('test_auroc', auroc(probs, y_ku), prog_bar=True)
         return
-    
+
     def configure_optimizers(self):
         optim = Adam(self.parameters(), self.lr)
         lr_sched = ReduceLROnPlateau(
-            optim, mode='max', factor=0.5, patience=5, verbose=1, 
+            optim, mode='max', factor=0.5, patience=5, verbose=1,
         )
         lr_sched = {
             'scheduler': lr_sched,
@@ -479,16 +481,16 @@ class CVAECapOSR(pl.LightningModule):
 
 def get_model(args, data_info):
     model_args = {
-        'num_classes': len(args.known_classes), 
-        'in_channels': data_info['channels'], 
-        'in_dim_caps': args.in_dim_caps, 
-        'out_dim_caps': args.out_dim_caps, 
+        'num_classes': len(args.known_classes),
+        'in_channels': data_info['channels'],
+        'in_dim_caps': args.in_dim_caps,
+        'out_dim_caps': args.out_dim_caps,
         't_mu_shift': args.t_mu_shift,
-        't_var_scale': args.t_var_scale, 
-        'z_dim': args.z_dim, 
-        'alpha': args.alpha, 
-        'beta': args.beta, 
-        'margin': args.margin, 
+        't_var_scale': args.t_var_scale,
+        'z_dim': args.z_dim,
+        'alpha': args.alpha,
+        'beta': args.beta,
+        'margin': args.margin,
         'lr': args.lr,
     }
     model = CVAECapOSR(**model_args)
