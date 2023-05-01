@@ -48,14 +48,14 @@ class BasicBlock(nn.Module):
 
 
 ##################################################
-# ResNet34 Model
+# ResNet Model
 ##################################################
 
-class ResNet34(nn.Module):
+class ResNet(nn.Module):
     def __init__(self, in_channels=3, inplanes=64):
-        super(ResNet34, self).__init__()
+        super(ResNet, self).__init__()
         self.inplanes = inplanes
-        self.conv1 = nn.Conv2d(in_channels, self.inplanes, kernel_size=7, 
+        self.conv1 = nn.Conv2d(in_channels, self.inplanes, kernel_size=7,
                                stride=1, padding=3, bias=False)
         self.bn1 = nn.BatchNorm2d(self.inplanes)
         self.relu = nn.ReLU(inplace=True)
@@ -68,11 +68,11 @@ class ResNet34(nn.Module):
 
         # Init layers
         self._init_layers()
-        
+
     def _init_layers(self):
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
-                nn.init.kaiming_normal_(m.weight, mode='fan_out', 
+                nn.init.kaiming_normal_(m.weight, mode='fan_out',
                                         nonlinearity='relu')
             elif isinstance(m, (nn.BatchNorm2d, nn.GroupNorm)):
                 nn.init.constant_(m.weight, 1)
