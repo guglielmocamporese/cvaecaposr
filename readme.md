@@ -87,6 +87,7 @@ For all the experiments we have used a GeForce RTX 2080 Ti (11GB of memory) GPU.
 For the training you will need ~7300 MiB of GPU memory whereas for test ~5000 MiB of GPU memory.
 
 ## Train
+You can download the pretrained backbone from https://drive.google.com/file/d/1ormoQliPf3f4YxUoohtrItSXuhH24FRK/view?usp=share_link
 
 The **CVAECapOSR** model can be trained using the `main.py` program. Here we reported an example of a training script for the `mnist` experiment:
 

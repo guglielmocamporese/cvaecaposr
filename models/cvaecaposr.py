@@ -17,7 +17,7 @@ from torch.optim.lr_scheduler import ReduceLROnPlateau
 # Custom
 from losses import kl_div
 from metrics import accuracy
-from models.resnet import ResNet34
+from models.resnet import ResNet
 
 
 ##################################################
@@ -268,7 +268,9 @@ class CVAECapOSR(pl.LightningModule):
         self.z_dim = z_dim
         self.num_classes = num_classes
         self.spatial_size = 8 # Spatial size of the middle feature [bs, ch, 8, 8]
-        self.enc = ResNet34(in_channels=in_channels)
+        self.enc = ResNet(in_channels=in_channels)
+        weights = "./resnet34-b627a593.pth"
+        self.enc.load_state_dict(torch.load(weights), strict=False)
         self.vae_cap = VaeCap(
             planes=512, in_dim_caps=in_dim_caps, out_num_caps=num_classes, out_dim_caps=out_dim_caps,
             spatial_size=self.spatial_size, t_mu_shift=t_mu_shift, z_dim=z_dim,
