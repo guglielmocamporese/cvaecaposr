@@ -197,3 +197,10 @@ Here we reported the reconstruction of some test samples of the model after trai
 |**TinyImageNet** |
 | --------- |
 | ![alt text](images/tiny_imagenet_reconstruction.png) |
+
+### F1
+CIFAR10:
+
+inference without judgement: 0.5860
+
+inference with judgement: 0.9318
