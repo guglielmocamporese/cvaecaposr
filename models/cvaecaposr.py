@@ -450,21 +450,46 @@ class CVAECapOSR(pl.LightningModule):
     def test_step(self, batch, idx_batch):
         x, y_str = batch
         y_ku = torch.from_numpy(np.array([0 if y_i.split('_')[0] == 'k' else 1 for y_i in y_str])).to(x.device)
+        ####### add for calculating F1
+        y_unknown_mask = y_ku == 1
+        y = torch.from_numpy(np.array([int(y_i.split('_')[-1]) for y_i in y_str])).to(x.device)
+        #######
 
         # Forward with teacher forcing
         preds = self(x)
         probs = torch.max(F.softmax(preds['logits'], -1), -1)[0]
 
+        ####### add for calculating F1
+        t_mu, t_var = self.t_mean(y), self.t_var(y)
+        t_mu = t_mu.view(preds['z_mu'].shape)
+        t_var = t_var.view(preds['z_var'].shape)
+        loss_kl = kl_div(preds['z_mu'], preds['z_var'], t_mu.detach(), t_var.detach())
+        # kl threshold for judging unknown classes
+        pred_unknown_mask = torch.max(loss_kl, dim=-1)[0] > 10
+        pred_cls = F.softmax(preds['logits'], dim=-1).argmax(-1)
+        y[y_unknown_mask] = self.num_classes
+        pred_cls[pred_unknown_mask] = self.num_classes
+        #######
+
         tb_log = self.logger.experiment
         x_hat_grid = torchvision.utils.make_grid(preds['x_hat'][:16], nrow=4, padding=0)
         tb_log.add_image('test_x_hat', x_hat_grid.detach().cpu(), idx_batch)
-        return torch.stack([probs, y_ku], -1)
+        # return torch.stack([probs, y_ku], -1)
+        ########## add for calculating F1
+        return torch.stack([pred_cls, y], -1)
+        ##########
 
     def test_epoch_end(self, test_outputs):
-        auroc = pl.metrics.classification.AUROC(pos_label=0)
-        probs, y_ku = torch.cat(test_outputs, 0).T
-        y_ku = y_ku.to(torch.int64)
-        self.log('test_auroc', auroc(probs, y_ku), prog_bar=True)
+        ########## calculating F1
+        f1 = pl.metrics.classification.F1(num_classes=self.num_classes + 1).to(test_outputs[0].device)
+        pred, y = torch.cat(test_outputs, 0).T
+        self.log('test_f1', f1(pred, y), prog_bar=True)
+        ##########
+
+        # auroc = pl.metrics.classification.AUROC(pos_label=0)
+        # probs, y_ku = torch.cat(test_outputs, 0).T
+        # y_ku = y_ku.to(torch.int64)
+        # self.log('test_auroc', auroc(probs, y_ku), prog_bar=True)
         return
 
     def configure_optimizers(self):
